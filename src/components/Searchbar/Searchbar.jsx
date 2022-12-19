@@ -7,13 +7,21 @@ export class Searchbar extends Component {
   };
   handleChange = e => {
     this.setState({ inputValue: e.currentTarget.value });
+    console.log(this.state.inputValue);
+  };
+
+  handleSabmit = e => {
+    e.preventDefault();
+
     this.props.onSubmit(this.state.inputValue);
+    console.log(this.state.inputValue);
+    // this.setState({ inputValue: '' });
   };
 
   render() {
     return (
       <header className="searchbar">
-        <form className="form">
+        <form className="form" onSubmit={this.handleSabmit}>
           <button type="submit" className="button">
             <span className="button-label">Search</span>
           </button>
