@@ -183,17 +183,33 @@ img {
   background-color: rgba(0, 0, 0, 0.8);
   z-index: 1200;
 }
-.overlay.is-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
 
 .modal {
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 24px);
 }
 
+.modal__img {
+  max-width: 800px;
+  max-height: 600px;
+}
+.modal__btn {
+  position: absolute;
+  bottom: 90%;
+  left: 90%;
+
+  border-radius: 50%;
+  padding: 5px;
+  background-color: transparent;
+  border-color: transparent;
+  cursor: pointer;
+  color: moccasin;
+}
+
+.modal__btn:hover,
+.modal__btn:focus {
+  scale: 1.5;
+}
 /*
 * Стили компонента Buton (Load more)
 */

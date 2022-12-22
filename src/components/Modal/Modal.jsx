@@ -1,15 +1,24 @@
-export function Modal({ url, tags, hidden }) {
-  console.log(hidden);
-  const classNames = ['overlay'];
-  if (!hidden) {
-    classNames.push('is-hidden');
+import React, { Component } from 'react';
+import { createPortal } from 'react-dom';
+
+const modalRoot = document.querySelector('#modal-root');
+
+export class Modal extends Component {
+  componentDidMount() {
+    window.addEventListener('keydown', e => {
+      if (e.code === 'Escape') {
+        this.props.onClose();
+      }
+    });
   }
 
-  return (
-    <div className={classNames.join(' ')}>
-      <div className="modal">
-        <img src="url" alt="tags" />
-      </div>
-    </div>
-  );
+  render() {
+    const { children } = this.props;
+    return createPortal(
+      <div className="overlay">
+        <div className="modal">{children}</div>
+      </div>,
+      modalRoot
+    );
+  }
 }

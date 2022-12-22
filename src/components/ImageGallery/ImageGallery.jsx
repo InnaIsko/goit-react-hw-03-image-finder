@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { AiOutlineClose } from 'react-icons/ai';
 
 import { ImageGalleryItem } from './ImageGalleryItem';
 import { Modal } from 'components/Modal/Modal';
@@ -6,14 +7,17 @@ import { Modal } from 'components/Modal/Modal';
 export class ImageGallery extends Component {
   state = { url: '', tags: '', hidden: true };
 
+  handlerClickVisually = () => {
+    this.setState(PrevState => ({ hidden: !PrevState.hidden }));
+  };
   handlerClickImg = (url, tags) => {
-    this.setState({ url, tags, hidden: false });
-    console.log(this.state);
+    this.handlerClickVisually();
+    this.setState({ url, tags });
   };
 
   render() {
-    console.log(this.state);
     const { data } = this.props;
+    const { url, tags, hidden } = this.state;
     return (
       <ul className="gallery">
         {data.map(element => (
@@ -23,11 +27,18 @@ export class ImageGallery extends Component {
             handlerClickImg={this.handlerClickImg}
           />
         ))}
-        <Modal
-          url={this.state.url}
-          tags={this.state.tags}
-          hidden={this.state.hidden}
-        />
+        {!hidden && (
+          <Modal onClose={this.handlerClickVisually}>
+            <img className="modal__img" src={url} alt={tags} />
+            <button
+              className="modal__btn"
+              type="button"
+              onClick={this.handlerClickVisually}
+            >
+              <AiOutlineClose />
+            </button>
+          </Modal>
+        )}
       </ul>
     );
   }
