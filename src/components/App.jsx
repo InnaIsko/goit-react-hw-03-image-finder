@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Dna } from 'react-loader-spinner';
 // import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 
@@ -12,6 +13,7 @@ export class App extends Component {
     page: 1,
     name: '',
     error: null,
+    visibleLoader: false,
   };
 
   onFetchApi = nameImg => {
@@ -35,7 +37,9 @@ export class App extends Component {
     if (prevState.data !== this.state.data) {
       this.setState(prevState => ({ page: (prevState.page += 1) }));
     }
+
     if (prevState.name !== this.state.name) {
+      this.setState({ visibleLoader: true });
       this.onFetchApi()
         .then(resp => {
           if (resp.ok) {
@@ -55,17 +59,25 @@ export class App extends Component {
             data: [...data.hits],
           }));
         })
-        .catch(error => this.setState({ error }));
+        .catch(error => this.setState({ error }))
+        .finally(() => {
+          this.setState({ visibleLoader: false });
+        });
     }
   }
 
   onLoadMore = () => {
+    this.setState({ visibleLoader: true });
     this.onFetchApi()
       .then(resp => resp.json())
       .then(data => {
         this.setState(prevState => ({
           data: [...prevState.data, ...data.hits],
         }));
+      })
+      .catch(error => this.setState({ error }))
+      .finally(() => {
+        this.setState({ visibleLoader: false });
       });
   };
   render() {
@@ -73,7 +85,16 @@ export class App extends Component {
       <div className="finderWraper">
         {this.state.error && <p>{this.state.error.massage}</p>}
         <Searchbar onSubmit={this.onSubmit} />
+
         <ImageGallery data={this.state.data} />
+        <Dna
+          visible={this.state.visibleLoader}
+          height="100"
+          width="100"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
         {this.state.data.length >= 12 && (
           <Button onClickBtn={this.onLoadMore} />
         )}
