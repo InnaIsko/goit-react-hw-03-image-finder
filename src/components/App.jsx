@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Dna } from 'react-loader-spinner';
-// import { ToastContainer, toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Button } from './Button/Button';
+import { Loader } from './Loader/Loader';
 
 export class App extends Component {
   state = {
@@ -16,7 +16,38 @@ export class App extends Component {
     visibleLoader: false,
   };
 
-  onFetchApi = nameImg => {
+  componentDidUpdate(_, prevState) {
+    if (
+      prevState.name !== this.state.name ||
+      prevState.page !== this.state.page
+    ) {
+      this.setState({ visibleLoader: true });
+      this.onFetchApi()
+        .then(resp => {
+          if (resp.ok) {
+            return resp.json();
+          }
+          return Promise.reject(
+            new Error(`There are no images for your request`)
+          );
+        })
+        .then(data => {
+          if (data.hits.length === 0) {
+            this.notify();
+          }
+          this.setState(prevState => ({
+            data: [...prevState.data, ...data.hits],
+          }));
+        })
+        .catch(error => this.setState({ error }))
+        .finally(() => {
+          this.setState({ visibleLoader: false });
+        });
+    }
+  }
+  notify = () => toast.info('There are no images for your request');
+
+  onFetchApi = () => {
     const BASE_URL = 'https://pixabay.com/api/';
     const API_KEY = 'key=30946911-c6f6e3f672fcb97cd0cd3059d';
     const OPTIONS = '&image_type=photo&orientation=horizontal&per_page=12';
@@ -29,76 +60,36 @@ export class App extends Component {
 
   onSubmit = nameImg => {
     this.setState({ name: nameImg });
+    if (this.state.name) {
+      this.setState({ data: [] });
+    }
   };
 
-  // notify = () => toast('123');
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.data !== this.state.data) {
-      this.setState(prevState => ({ page: (prevState.page += 1) }));
-    }
-
-    if (prevState.name !== this.state.name) {
-      this.setState({ visibleLoader: true });
-      this.onFetchApi()
-        .then(resp => {
-          if (resp.ok) {
-            return resp.json();
-          }
-          return Promise.reject(
-            new Error(`There are no images for your request`)
-          );
-        })
-        .then(data => {
-          // console.log(data.hits.length);
-          // if (data.hits.length === 0) {
-          //   console.log(123);
-          //   this.notify();
-          // }
-          this.setState(prevState => ({
-            data: [...data.hits],
-          }));
-        })
-        .catch(error => this.setState({ error }))
-        .finally(() => {
-          this.setState({ visibleLoader: false });
-        });
-    }
-  }
-
   onLoadMore = () => {
-    this.setState({ visibleLoader: true });
-    this.onFetchApi()
-      .then(resp => resp.json())
-      .then(data => {
-        this.setState(prevState => ({
-          data: [...prevState.data, ...data.hits],
-        }));
-      })
-      .catch(error => this.setState({ error }))
-      .finally(() => {
-        this.setState({ visibleLoader: false });
-      });
+    this.setState(prevState => ({ page: (prevState.page += 1) }));
   };
 
   render() {
+    const { error, data, visibleLoader } = this.state;
     return (
       <div className="finderWraper">
-        {this.state.error && <p>{this.state.error.massage}</p>}
+        {error && <p>{error.massage}</p>}
         <Searchbar onSubmit={this.onSubmit} />
-
-        <ImageGallery data={this.state.data} />
-        <Dna
-          visible={this.state.visibleLoader}
-          height="100"
-          width="100"
-          ariaLabel="dna-loading"
-          wrapperStyle={{}}
-          wrapperClass="dna-wrapper"
+        <ImageGallery data={data} />
+        <Loader visible={visibleLoader} />
+        {data.length >= 12 && <Button onClickBtn={this.onLoadMore} />}
+        <ToastContainer
+          position="top-center"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
         />
-        {this.state.data.length >= 12 && (
-          <Button onClickBtn={this.onLoadMore} />
-        )}
       </div>
     );
   }

@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 export function ImageGalleryItem({ imageInfo, handlerClickImg }) {
   return (
     <li
@@ -8,3 +10,11 @@ export function ImageGalleryItem({ imageInfo, handlerClickImg }) {
     </li>
   );
 }
+
+ImageGalleryItem.propTypes = {
+  imageInfo: PropTypes.shape({
+    largeImageURL: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+  }),
+  handlerClickImg: PropTypes.func.isRequired,
+};

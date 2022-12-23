@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { AiOutlineClose } from 'react-icons/ai';
 
 import { ImageGalleryItem } from './ImageGalleryItem';
 import { Modal } from 'components/Modal/Modal';
 
 export class ImageGallery extends Component {
-  state = { url: '', tags: '', hidden: true };
+  state = {
+    url: '',
+    tags: '',
+    hidden: true,
+  };
 
   handlerClickVisually = () => {
     this.setState(PrevState => ({ hidden: !PrevState.hidden }));
@@ -43,3 +48,7 @@ export class ImageGallery extends Component {
     );
   }
 }
+
+ImageGallery.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.object.isRequired),
+};
