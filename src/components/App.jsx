@@ -61,12 +61,12 @@ export class App extends Component {
   onSubmit = nameImg => {
     this.setState({ name: nameImg });
     if (this.state.name) {
-      this.setState({ data: [] });
+      this.setState({ data: [], page: 1 });
     }
   };
 
   onLoadMore = () => {
-    this.setState(prevState => ({ page: (prevState.page += 1) }));
+    this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
   render() {
